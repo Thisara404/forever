@@ -8,7 +8,7 @@ export const useServerHealth = () => {
   useEffect(() => {
     const checkServerHealth = async () => {
       try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/health`);
+        const response = await fetch('http://forever-server-p95j.onrender.com/api/health');
         const data = await response.json();
         
         if (lastServerTime && data.uptime < 60) { // Server uptime less than 1 minute
