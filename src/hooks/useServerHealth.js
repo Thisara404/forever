@@ -8,7 +8,7 @@ export const useServerHealth = () => {
   useEffect(() => {
     const checkServerHealth = async () => {
       try {
-        const response = await fetch('http://forever-server-p95j.onrender.com/api/health');
+        const response = await fetch('https://forever-server-p95j.onrender.com/api/health');
         const data = await response.json();
         
         if (lastServerTime && data.uptime < 60) { // Server uptime less than 1 minute
