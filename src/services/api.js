@@ -1,11 +1,11 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://forever-server-p95j.onrender.com/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://forever-server-p95j.onrender.com/api';
 
 // Update the fetchWithAuth function and auth methods
 
 const fetchWithAuth = async (url, options = {}) => {
   try {
     const token = localStorage.getItem('token');
-    const baseURL = import.meta.env.VITE_API_URL || 'http://forever-server-p95j.onrender.com/api';
+    const baseURL = import.meta.env.VITE_API_URL || 'https://forever-server-p95j.onrender.com/api';
     const fullUrl = `${baseURL}${url}`;
     
     console.log('🌐 API Request:', {
