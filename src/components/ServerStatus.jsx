@@ -7,7 +7,7 @@ const ServerStatus = () => {
   useEffect(() => {
     const checkServer = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/health');
+        const response = await fetch('https://forever-server-p95j.onrender.com/api/health');
         if (response.ok) {
           setServerStatus('online');
         } else {
