@@ -7,7 +7,7 @@ export const useServerHealth = () => {
   const [lastChecked, setLastChecked] = useState(null);
 
   // Use environment variable or fallback to production URL
-  const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://forever-server-p95j.onrender.com';
+  const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://forever-server-p95j.onrender.com/api';
 
   useEffect(() => {
     const checkServerHealth = async () => {
@@ -15,7 +15,7 @@ export const useServerHealth = () => {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 10000); // Increased timeout for Render
 
-        const response = await fetch(`${API_BASE_URL}/api/health`, {
+        const response = await fetch(`${API_BASE_URL}/health`, {
           signal: controller.signal,
           method: 'GET',
           headers: {
