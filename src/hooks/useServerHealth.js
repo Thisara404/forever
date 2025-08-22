@@ -2,24 +2,27 @@
 import { useState, useEffect } from 'react';
 
 export const useServerHealth = () => {
-  const [isHealthy, setIsHealthy] = useState(true); // Default to healthy
+  const [isHealthy, setIsHealthy] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
   const [lastChecked, setLastChecked] = useState(null);
+
+  // Use environment variable or fallback to production URL
+  const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://forever-server-p95j.onrender.com';
 
   useEffect(() => {
     const checkServerHealth = async () => {
       try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+        const timeoutId = setTimeout(() => controller.abort(), 10000); // Increased timeout for Render
 
-        const response = await fetch('http://localhost:5000/api/health', {
+        const response = await fetch(`${API_BASE_URL}/api/health`, {
           signal: controller.signal,
           method: 'GET',
           headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
           },
-          mode: 'cors' // Explicitly set CORS mode
+          mode: 'cors'
         });
         
         clearTimeout(timeoutId);
@@ -34,9 +37,9 @@ export const useServerHealth = () => {
         }
       } catch (error) {
         if (error.name === 'AbortError') {
-          console.warn('⏰ Health check timeout');
+          console.warn('⏰ Health check timeout - server may be sleeping');
         } else if (error.message.includes('CORS')) {
-          console.warn('🔒 CORS error - server may be starting up');
+          console.warn('🔒 CORS error - check server configuration');
         } else {
           console.warn('⚠️ Health check failed:', error.message);
         }
@@ -47,19 +50,19 @@ export const useServerHealth = () => {
       }
     };
 
-    // Initial check with delay to let server start
+    // Initial check with longer delay for Render cold starts
     const initialTimeout = setTimeout(() => {
       checkServerHealth();
-    }, 1000);
+    }, 3000);
 
-    // Check every 30 seconds (reduced frequency to avoid rate limiting)
-    const interval = setInterval(checkServerHealth, 30000);
+    // Check every 60 seconds for deployed apps
+    const interval = setInterval(checkServerHealth, 60000);
 
     return () => {
       clearTimeout(initialTimeout);
       clearInterval(interval);
     };
-  }, []);
+  }, [API_BASE_URL]);
 
   return { isHealthy, isLoading, lastChecked };
 };
