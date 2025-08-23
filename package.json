@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build && echo '/*    /index.html   200' > dist/_redirects",
+    "build": "vite build",
+    "start": "node server.js",
     "lint": "eslint .",
     "preview": "vite preview"
   },
@@ -22,6 +23,7 @@
     "@stripe/stripe-js": "^7.8.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "express": "^4.18.2",
     "lucide-react": "^0.540.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
