@@ -103,39 +103,22 @@ const StripePayment = ({ orderId, amount, onSuccess, onCancel }) => {
     try {
       console.log("🔄 Processing payment for amount:", amount);
 
-      // FIXED: Send amount in LKR, not cents
-      const paymentIntentResponse = await ApiService.createStripePaymentIntent({
+      // FIXED: Use the simplified payment processing endpoint
+      const response = await ApiService.processStripePayment({
         orderId,
-        amount: amount, // ✅ Send in LKR, backend will convert to cents
-        currency: "lkr",
+        amount: amount, // Amount in LKR
+        cardNumber: cardNumber.replace(/\s/g, ""), // Remove spaces
+        expiryMonth: expiryDate.split("/")[0],
+        expiryYear: expiryDate.split("/")[1],
+        cvc: cvc,
+        zip: zip || "12345", // Default zip if not provided
       });
 
-      if (!paymentIntentResponse.success) {
-        throw new Error(paymentIntentResponse.message);
-      }
-
-      // Step 2: Simulate payment success (in real app, use Stripe Elements)
-      const isTestCard = ["4242424242424242", "5555555555554444"].includes(
-        cardNumber.replace(/\s/g, "")
-      );
-
-      if (isTestCard) {
-        // Confirm payment
-        const confirmResponse = await ApiService.confirmStripePayment({
-          paymentIntentId: paymentIntentResponse.paymentIntentId,
-          orderId: orderId,
-        });
-
-        if (confirmResponse.success) {
-          toast.success("Payment successful!");
-          onSuccess();
-        } else {
-          throw new Error(
-            confirmResponse.message || "Payment confirmation failed"
-          );
-        }
+      if (response.success) {
+        toast.success("Payment successful!");
+        onSuccess();
       } else {
-        throw new Error("Please use a test card number");
+        throw new Error(response.message || "Payment failed");
       }
     } catch (error) {
       console.error("Payment error:", error);
