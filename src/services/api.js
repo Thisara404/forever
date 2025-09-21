@@ -1,35 +1,39 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://forever-server-p95j.onrender.com/api';
+const API_BASE_URL =
+  import.meta.env.VITE_API_URL ||
+  "https://forever-server-p95j.onrender.com/api";
 
 // Update the fetchWithAuth function and auth methods
 
 const fetchWithAuth = async (url, options = {}) => {
   try {
-    const token = localStorage.getItem('token');
-    const baseURL = import.meta.env.VITE_API_URL || 'https://forever-server-p95j.onrender.com/api';
+    const token = localStorage.getItem("token");
+    const baseURL =
+      import.meta.env.VITE_API_URL ||
+      "https://forever-server-p95j.onrender.com/api";
     const fullUrl = `${baseURL}${url}`;
-    
-    console.log('🌐 API Request:', {
+
+    console.log("🌐 API Request:", {
       url: fullUrl,
-      method: options.method || 'GET',
+      method: options.method || "GET",
       hasToken: !!token,
-      hasBody: !!options.body
+      hasBody: !!options.body,
     });
 
     const config = {
-      method: 'GET',
+      method: "GET",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
         ...(token && { Authorization: `Bearer ${token}` }),
       },
       ...options,
     };
 
     const response = await fetch(fullUrl, config);
-    
-    console.log('📡 API Response Status:', {
+
+    console.log("📡 API Response Status:", {
       status: response.status,
       ok: response.ok,
-      url: fullUrl
+      url: fullUrl,
     });
 
     // Always try to parse JSON response
@@ -38,26 +42,26 @@ const fetchWithAuth = async (url, options = {}) => {
       const text = await response.text();
       data = text ? JSON.parse(text) : {};
     } catch (parseError) {
-      console.error('❌ JSON Parse Error:', parseError);
-      throw new Error('Invalid response format from server');
+      console.error("❌ JSON Parse Error:", parseError);
+      throw new Error("Invalid response format from server");
     }
 
-    console.log('📥 API Response Data:', data);
+    console.log("📥 API Response Data:", data);
 
     if (!response.ok) {
       // Handle HTTP error responses
       const errorMessage = data.message || `HTTP Error: ${response.status}`;
-      console.error('❌ API Error Response:', {
+      console.error("❌ API Error Response:", {
         status: response.status,
         message: errorMessage,
-        data
+        data,
       });
       throw new Error(errorMessage);
     }
 
     return data;
   } catch (error) {
-    console.error('❌ API Fetch Error:', error);
+    console.error("❌ API Fetch Error:", error);
     throw error;
   }
 };
@@ -65,47 +69,47 @@ const fetchWithAuth = async (url, options = {}) => {
 // Update auth methods
 const login = async (credentials) => {
   try {
-    console.log('🔐 Login request:', { email: credentials.email });
-    
-    const response = await fetchWithAuth('/auth/login', {
-      method: 'POST',
+    console.log("🔐 Login request:", { email: credentials.email });
+
+    const response = await fetchWithAuth("/auth/login", {
+      method: "POST",
       body: JSON.stringify(credentials),
     });
-    
-    console.log('✅ Login response:', response);
+
+    console.log("✅ Login response:", response);
     return response;
   } catch (error) {
-    console.error('❌ Login API error:', error);
+    console.error("❌ Login API error:", error);
     throw error;
   }
 };
 
 const register = async (userData) => {
   try {
-    console.log('📝 Register request:', { 
-      name: userData.name, 
-      email: userData.email 
+    console.log("📝 Register request:", {
+      name: userData.name,
+      email: userData.email,
     });
-    
-    const response = await fetchWithAuth('/auth/register', {
-      method: 'POST',
+
+    const response = await fetchWithAuth("/auth/register", {
+      method: "POST",
       body: JSON.stringify(userData),
     });
-    
-    console.log('✅ Register response:', response);
+
+    console.log("✅ Register response:", response);
     return response;
   } catch (error) {
-    console.error('❌ Register API error:', error);
+    console.error("❌ Register API error:", error);
     throw error;
   }
 };
 
 const getUserProfile = async () => {
   try {
-    const response = await fetchWithAuth('/auth/profile');
+    const response = await fetchWithAuth("/auth/profile");
     return response;
   } catch (error) {
-    console.error('❌ Get profile API error:', error);
+    console.error("❌ Get profile API error:", error);
     throw error;
   }
 };
@@ -114,16 +118,19 @@ const getUserProfile = async () => {
 const getProducts = async (params = {}) => {
   // Clean up params - remove empty values
   const cleanParams = Object.entries(params).reduce((acc, [key, value]) => {
-    if (value !== null && value !== undefined && value !== '') {
+    if (value !== null && value !== undefined && value !== "") {
       acc[key] = value;
     }
     return acc;
   }, {});
 
   const queryString = new URLSearchParams(cleanParams).toString();
-  console.log('🔍 API Request:', `${API_BASE_URL}/products${queryString ? `?${queryString}` : ''}`);
-  
-  return fetchWithAuth(`/products${queryString ? `?${queryString}` : ''}`);
+  console.log(
+    "🔍 API Request:",
+    `${API_BASE_URL}/products${queryString ? `?${queryString}` : ""}`
+  );
+
+  return fetchWithAuth(`/products${queryString ? `?${queryString}` : ""}`);
 };
 
 const getProduct = async (id) => {
@@ -132,40 +139,46 @@ const getProduct = async (id) => {
 
 // Cart APIs
 const getCart = async () => {
-  return fetchWithAuth('/cart');
+  return fetchWithAuth("/cart");
 };
 
 const addToCart = async (productId, size, quantity = 1) => {
-  return fetchWithAuth('/cart/add', {
-    method: 'POST',
+  return fetchWithAuth("/cart/add", {
+    method: "POST",
     body: JSON.stringify({ productId, size, quantity }),
   });
 };
 
 const updateCartItem = async (productId, size, quantity) => {
-  return fetchWithAuth('/cart/update', {
-    method: 'PUT',
+  return fetchWithAuth("/cart/update", {
+    method: "PUT",
     body: JSON.stringify({ productId, size, quantity }),
   });
 };
 
 const removeFromCart = async (productId, size) => {
-  return fetchWithAuth('/cart/remove', {
-    method: 'DELETE',
+  return fetchWithAuth("/cart/remove", {
+    method: "DELETE",
     body: JSON.stringify({ productId, size }),
+  });
+};
+
+const clearCart = async () => {
+  return fetchWithAuth("/cart/clear", {
+    method: "DELETE",
   });
 };
 
 // Order APIs
 const createOrder = async (orderData) => {
-  return fetchWithAuth('/orders', {
-    method: 'POST',
+  return fetchWithAuth("/orders", {
+    method: "POST",
     body: JSON.stringify(orderData),
   });
 };
 
 const getUserOrders = async () => {
-  return fetchWithAuth('/orders');
+  return fetchWithAuth("/orders");
 };
 
 const getOrder = async (orderId) => {
@@ -174,44 +187,60 @@ const getOrder = async (orderId) => {
 
 // Payment APIs
 const createPayHerePayment = async (orderId, amount) => {
-  return fetchWithAuth('/payments/payhere/create-payment', {
-    method: 'POST',
-    body: JSON.stringify({ orderId, amount, currency: 'LKR' }),
+  return fetchWithAuth("/payments/payhere/create-payment", {
+    method: "POST",
+    body: JSON.stringify({ orderId, amount, currency: "LKR" }),
   });
 };
 
 const createStripePayment = async (orderId, amount) => {
-  console.log('🔄 Creating Stripe payment intent...');
-  
-  return fetchWithAuth('/payments/stripe/create-payment-intent', {
-    method: 'POST',
-    body: JSON.stringify({ 
-      orderId, 
+  console.log("🔄 Creating Stripe payment intent...");
+
+  return fetchWithAuth("/payments/stripe/create-payment-intent", {
+    method: "POST",
+    body: JSON.stringify({
+      orderId,
       amount: Number(amount),
-      currency: 'lkr'
+      currency: "lkr",
     }),
   });
 };
 
 const processCODOrder = async (orderId) => {
-  return fetchWithAuth('/payments/cod/process', {
-    method: 'POST',
+  return fetchWithAuth("/payments/cod/process", {
+    method: "POST",
     body: JSON.stringify({ orderId }),
   });
 };
 
 const createStripePaymentIntent = async (data) => {
-  return fetchWithAuth('/payments/stripe/create-payment-intent', {
-    method: 'POST',
+  return fetchWithAuth("/payments/stripe/create-payment-intent", {
+    method: "POST",
     body: JSON.stringify(data),
   });
 };
 
 const confirmStripePayment = async (data) => {
-  return fetchWithAuth('/payments/stripe/confirm', {
-    method: 'POST',
+  return fetchWithAuth("/payments/stripe/confirm", {
+    method: "POST",
     body: JSON.stringify(data),
   });
+};
+
+const processStripePayment = async (paymentData) => {
+  try {
+    console.log("🔄 Processing Stripe payment...");
+
+    const response = await fetchWithAuth("/payments/stripe/process", {
+      method: "POST",
+      body: JSON.stringify(paymentData),
+    });
+
+    return response;
+  } catch (error) {
+    console.error("❌ Stripe payment error:", error);
+    throw error;
+  }
 };
 
 // Make sure to export all methods
@@ -226,6 +255,7 @@ export default {
   addToCart,
   updateCartItem,
   removeFromCart,
+  clearCart,
   createOrder,
   getUserOrders,
   getOrder,
@@ -234,4 +264,5 @@ export default {
   processCODOrder,
   createStripePaymentIntent,
   confirmStripePayment,
+  processStripePayment,
 };
