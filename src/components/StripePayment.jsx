@@ -101,13 +101,12 @@ const StripePayment = ({ orderId, amount, onSuccess, onCancel }) => {
     setProcessing(true);
 
     try {
-      // FIXED: Use the correct API method for Stripe payment
-      // Instead of ApiService.processStripePayment, use the proper flow
+      console.log("🔄 Processing payment for amount:", amount);
 
-      // Step 1: Create payment intent
+      // FIXED: Send amount in LKR, not cents
       const paymentIntentResponse = await ApiService.createStripePaymentIntent({
         orderId,
-        amount: Math.round(amount * 100), // Convert to cents
+        amount: amount, // ✅ Send in LKR, backend will convert to cents
         currency: "lkr",
       });
 
@@ -116,7 +115,6 @@ const StripePayment = ({ orderId, amount, onSuccess, onCancel }) => {
       }
 
       // Step 2: Simulate payment success (in real app, use Stripe Elements)
-      // For testing with test cards, simulate successful payment
       const isTestCard = ["4242424242424242", "5555555555554444"].includes(
         cardNumber.replace(/\s/g, "")
       );
@@ -146,6 +144,12 @@ const StripePayment = ({ orderId, amount, onSuccess, onCancel }) => {
       setProcessing(false);
     }
   };
+
+  console.log("💰 Payment details:", {
+    orderId,
+    amount,
+    amountType: typeof amount,
+  });
 
   return (
     <Card className="w-full max-w-md mx-auto">
